@@ -1,5 +1,8 @@
 """FastAPI application for benz_news_context service."""
-from fastapi import FastAPI
+from benz_common.db import DatabaseAdapter
+from fastapi import Depends, FastAPI, HTTPException
+
+from .dependencies import get_db_adapter
 
 app = FastAPI(
     title="benz_news_context",
@@ -9,6 +12,15 @@ app = FastAPI(
 
 
 @app.get("/health")
-async def health():
-    """Health check endpoint."""
-    return {"status": "healthy"}
+async def health(db: DatabaseAdapter = Depends(get_db_adapter)):
+    """Health check endpoint with database validation."""
+    try:
+        with db.read_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "unhealthy", "database": "error", "error": str(e)},
+        )
