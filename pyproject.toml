@@ -37,7 +37,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "--cov=src/benz_news_context --cov-report=term-missing"
+addopts = "--cov=src/benz_news_context --cov-report=term-missing --cov-fail-under=80"
 
 [tool.ruff]
 target-version = "py311"
